@@ -46,4 +46,5 @@ task :default => :test
 
 require 'yard'
 YARD::Rake::YardocTask.new do |t|
+  t.options = [ "--files", "README.md,LICENSE" ]
 end
