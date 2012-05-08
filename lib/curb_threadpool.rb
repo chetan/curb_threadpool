@@ -73,6 +73,9 @@ class Curl::ThreadPool
   #
   # @return [Hash<Key, String>] Hash of responses, if no block given
   def perform(no_block=false, &block)
+
+    @results = {} if not @results.empty?
+
     @clients.each do |client|
       @threads << Thread.new do
 
