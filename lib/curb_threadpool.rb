@@ -53,7 +53,7 @@ class Curl::ThreadPool
       @reqs[i] = url.to_s
     end
 
-    results = exec()
+    results = perform()
 
     ret = []
     (0..results.size-1).each do |i|
