@@ -72,7 +72,7 @@ class Curl::ThreadPool
   #                             instead of being returned directly
   #
   # @return [Hash<Key, String>] Hash of responses, if no block given
-  def exec(no_block=false, &block)
+  def perform(no_block=false, &block)
     @clients.each do |client|
       @threads << Thread.new do
 
