@@ -5,9 +5,8 @@ A multi-threaded worker pool for Curb.
 ## Usage
 
     ct = Curl::ThreadPool.new
-    reqs = []
     10000.times { |i| ct[i] = "http://localhost/test" }
-    responses = ct.exec() # => contains keyed response hash
+    responses = ct.perform() # => contains keyed response hash
 
 or
 
