@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile",
     "VERSION",
+    "curb_threadpool.gemspec",
     "lib/curb_threadpool.rb",
     "test/helper.rb",
     "test/test_curb_threadpool.rb"
@@ -29,7 +30,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/chetan/curb_threadpool"
   s.licenses = ["BSD"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.17"
+  s.rubygems_version = "1.8.24"
   s.summary = "A multi-threaded worker pool for Curb"
 
   if s.respond_to? :specification_version then
