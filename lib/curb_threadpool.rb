@@ -60,20 +60,30 @@ class ThreadPool
       @reqs << Request.new(i, url.to_s)
     end
 
-    results = perform()
-
-    ret = []
-    results.size.times do |i|
-      ret << results[i]
-    end
-
-    return ret
+    return collate_results(perform())
   end
 
   # Send multiple post requests
   #
   # @param [Array] reqs
   def post(reqs)
+    if reqs.nil? or reqs.empty? then
+      return []
+    end
+
+    if not reqs.first.kind_of? Array then
+      reqs = [ reqs ]
+    end
+
+    reqs.each_with_index do |r, i|
+      if r.kind_of? Request then
+        @reqs << r
+      elsif r.kind_of? Array then
+        @reqs << Request.new(i, r.shift, :post, r.shift)
+      end
+    end
+
+    return collate_results(perform())
   end
 
   # Execute requests. By default, will block until complete and return results.
@@ -98,9 +108,22 @@ class ThreadPool
           break if @reqs.empty?
           req = @reqs.shift
           client.url = req.uri
-          if req.method == :get then
-            client.http_get
+
+          args = ["http_#{req.method}"]
+          if [:put, :post].include? req.method
+            # add body to args for these methods
+            if req.body then
+              if req.body.kind_of? Array then
+                args += req.body
+              else
+                args << req.body
+              end
+            else
+              args << ""
+            end
           end
+
+          client.send(*args)
           if block then
             yield(req, client.body_str)
           else
@@ -120,6 +143,18 @@ class ThreadPool
     return true if block
 
     return @results
+  end
+
+
+  private
+
+  # Create ordered array from hash of results
+  def collate_results(results)
+    ret = []
+    results.size.times do |i|
+      ret << results[i]
+    end
+    return ret
   end
 
 end # ThreadPool
