@@ -45,6 +45,7 @@ class TestCurbThreadpool < MiniTest::Unit::TestCase
     pool = Curl::ThreadPool.new
     ret = pool.get([])
     assert_kind_of Array, ret
+    assert_empty ret
   end
 
 end

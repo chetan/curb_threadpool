@@ -5,24 +5,22 @@ require "curb"
 module Curl
 class ThreadPool
 
-  attr_reader :reqs, :results
+  class Request
+    attr_accessor :key, :uri, :body, :method
+    def initialize(key, uri, method=:get, body=nil)
+      @key    = key
+      @uri    = uri
+      @method = method
+      @body   = body
+    end
+  end
 
-  # @!attribute [r] reqs
-  #   @return [Hash] request key to URL hash
+  attr_reader :reqs, :results
 
   def initialize(size=4)
     @size = size
     reset()
   end
-
-  # Add a URL to be fetched
-  #
-  # @param [Object] key     to use for request
-  # @param [String] url     URL to fetch
-  def []=(key, url)
-    @reqs[key] = url
-  end
-  alias :add :[]=
 
   # Wait for all threads to complete
   def join
@@ -40,7 +38,7 @@ class ThreadPool
   # Reset the ThreadPool
   def reset
     close()
-    @reqs = {}
+    @reqs = []
     @results = {}
     @clients = []
     @threads = []
@@ -59,17 +57,23 @@ class ThreadPool
 
     urls = [urls] if not urls.kind_of? Array
     urls.each_with_index do |url, i|
-      @reqs[i] = url.to_s
+      @reqs << Request.new(i, url.to_s)
     end
 
     results = perform()
 
     ret = []
-    (0..results.size-1).each do |i|
+    results.size.times do |i|
       ret << results[i]
     end
 
     return ret
+  end
+
+  # Send multiple post requests
+  #
+  # @param [Array] reqs
+  def post(reqs)
   end
 
   # Execute requests. By default, will block until complete and return results.
@@ -79,6 +83,8 @@ class ThreadPool
   #
   # @param [Block] block        If passed, responses will be passed into the callback
   #                             instead of being returned directly
+  #
+  # @yield [Request, String]    Passes to the block the request and the response body
   #
   # @return [Hash<Key, String>] Hash of responses, if no block given. Returns true otherwise
   def perform(async=false, &block)
@@ -90,13 +96,15 @@ class ThreadPool
 
         loop do
           break if @reqs.empty?
-          (key, url) = @reqs.shift
-          client.url = url
-          client.http_get
+          req = @reqs.shift
+          client.url = req.uri
+          if req.method == :get then
+            client.http_get
+          end
           if block then
-            yield(key, client.body_str)
+            yield(req, client.body_str)
           else
-            @results[key] = client.body_str
+            @results[req.key] = client.body_str
           end
         end
 
