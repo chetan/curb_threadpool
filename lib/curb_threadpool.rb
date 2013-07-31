@@ -48,7 +48,7 @@ class ThreadPool
   # @return [Array] array of response bodies
   def get(urls)
     if urls.nil? or urls.empty? then
-      return {}
+      return []
     end
 
     urls = [urls] if not urls.kind_of? Array
