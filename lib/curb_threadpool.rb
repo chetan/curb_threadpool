@@ -17,8 +17,8 @@ class ThreadPool
 
   # Add a URL to be fetched
   #
-  # @param [Object] key  to use for request
-  # @param [String] url  URL to fetch
+  # @param [Object] key     to use for request
+  # @param [String] url     URL to fetch
   def []=(key, url)
     @reqs[key] = url
   end
@@ -32,7 +32,9 @@ class ThreadPool
 
   # Close all active Curl connections
   def close
-    @clients.each { |c| c.reset(); c.close() } if @clients
+    if @clients then
+      @clients.each { |c| c.reset(); c.close() }
+    end
   end
 
   # Reset the ThreadPool

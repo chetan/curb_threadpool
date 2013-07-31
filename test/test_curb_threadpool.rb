@@ -28,6 +28,9 @@ class TestCurbThreadpool < MiniTest::Unit::TestCase
     assert_equal 1, ret.size
     assert_equal "res 2", ret.first
 
+
+    pool.reset()
+
     i = 0
     urls = [url, url, url]
     ret = pool.get(urls)
