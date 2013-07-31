@@ -23,6 +23,12 @@ class ThreadPool
     reset()
   end
 
+  # Shorthand for adding requests
+  def add(req)
+    @reqs << req
+  end
+  alias_method :<<, :add
+
   # Wait for all threads to complete
   def join
     @threads.each { |t| t.join }
@@ -46,7 +52,7 @@ class ThreadPool
     @size.times{ @clients << Curl::Easy.new }
   end
 
-  # Utility method for retrieving a list of URLs
+  # Send multiple get requests
   #
   # @param [Array<String>] urls   list of URLs
   #
