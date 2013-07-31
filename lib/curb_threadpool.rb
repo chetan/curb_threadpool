@@ -5,7 +5,10 @@ require "curb"
 module Curl
 class ThreadPool
 
-  attr_reader :results
+  attr_reader :reqs, :results
+
+  # @!attribute [r] reqs
+  #   @return [Hash] request key to URL hash
 
   def initialize(size=4)
     @size = size
@@ -45,6 +48,7 @@ class ThreadPool
   # Utility method for retrieving a list of URLs
   #
   # @param [Array<String>] urls   list of URLs
+  #
   # @return [Array] array of response bodies
   def get(urls)
     if urls.nil? or urls.empty? then
@@ -68,16 +72,16 @@ class ThreadPool
 
   # Execute requests. By default, will block until complete and return results.
   #
-  # @param [Boolean] no_block   If true, will not wait for requests to finish.
+  # @param [Boolean] async      If true, will not wait for requests to finish.
   #                             (Default=false)
   #
   # @param [Block] block        If passed, responses will be passed into the callback
   #                             instead of being returned directly
   #
-  # @return [Hash<Key, String>] Hash of responses, if no block given
-  def perform(no_block=false, &block)
+  # @return [Hash<Key, String>] Hash of responses, if no block given. Returns true otherwise
+  def perform(async=false, &block)
 
-    @results = {} if not @results.empty?
+    @results = {}
 
     @clients.each do |client|
       @threads << Thread.new do
@@ -97,14 +101,15 @@ class ThreadPool
       end
     end
 
-    return {} if no_block
+    if async then
+      # don't wait for threads to join, just return
+      return true
+    end
 
     join()
     return true if block
 
-    ret = @results
-    @results = {}
-    return ret
+    return @results
   end
 
 end # ThreadPool
