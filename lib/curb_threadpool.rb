@@ -1,6 +1,9 @@
 
+require "curb"
+
 # A multi-threaded worker pool for Curb
-class Curl::ThreadPool
+module Curl
+class ThreadPool
 
   attr_reader :results
 
@@ -104,4 +107,5 @@ class Curl::ThreadPool
     return ret
   end
 
-end
+end # ThreadPool
+end # Curl

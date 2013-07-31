@@ -7,12 +7,16 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
-require 'test/unit'
-require 'shoulda'
+
+require 'test_guard'
+TestGuard.load_simplecov()
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'curb_threadpool'
+require 'webmock'
 
 class Test::Unit::TestCase
 end
+
+MiniTest::Unit.autorun
