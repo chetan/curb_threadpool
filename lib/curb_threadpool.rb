@@ -6,6 +6,7 @@ module Curl
 class ThreadPool
 
   class Request
+    # methods supported: :delete, :get, :head, :post, :put
     attr_accessor :key, :uri, :body, :method
     def initialize(key, uri, method=:get, body=nil)
       @key    = key
