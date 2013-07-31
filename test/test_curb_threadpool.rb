@@ -3,37 +3,40 @@ require 'helper'
 class TestCurbThreadpool < MiniTest::Unit::TestCase
 
   def setup
+    super
     WebMock.reset!
+    @url = "http://www.google.com"
+    @pool = Curl::ThreadPool.new
+    @i = 0
+  end
+
+  def teardown
+    super
+    @pool.reset()
   end
 
   def test_get
-    i = 0
-    stub = stub_request(:get, "http://www.google.com/").
-      to_return {
-        i += 1
-        { :status => 200, :body => "res #{i}" }
-      }
-
-    url = "http://www.google.com"
-    pool = Curl::ThreadPool.new
-    ret = pool.get(url)
+    stub_get()
+    ret = @pool.get(@url)
 
     assert ret
     assert_equal 1, ret.size
     assert_equal "res 1", ret.first
+  end
 
-    ret = pool.get([url])
+  def test_get_array_param
+    stub_get()
+    ret = @pool.get([@url])
 
     assert ret
     assert_equal 1, ret.size
-    assert_equal "res 2", ret.first
+    assert_equal "res 1", ret.first
+  end
 
-
-    pool.reset()
-
-    i = 0
-    urls = [url, url, url]
-    ret = pool.get(urls)
+  def test_get_multiple
+    stub_get()
+    urls = [@url, @url, @url]
+    ret = @pool.get(urls)
     assert ret
     assert_equal 3, ret.size
     ret.each_with_index do |r, idx|
@@ -47,5 +50,18 @@ class TestCurbThreadpool < MiniTest::Unit::TestCase
     assert_kind_of Array, ret
     assert_empty ret
   end
+
+
+  private
+
+  def stub_get
+    stub = stub_request(:get, "http://www.google.com/").
+      to_return {
+        @i += 1
+        { :status => 200, :body => "res #{@i}" }
+      }
+  end
+
+
 
 end
