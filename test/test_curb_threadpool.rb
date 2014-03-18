@@ -44,6 +44,31 @@ class TestCurbThreadpool < MiniTest::Unit::TestCase
     end
   end
 
+  def test_get_multiple_race_condition
+    # race condition with multiple threads looking for more work
+
+    @pool = Curl::ThreadPool.new(10)
+    urls = [@url]*100
+
+    10.times do |i|
+
+      rets = []
+      urls.size.times do
+        @i += 1
+        rets << { :status => 200, :body => @i }
+      end
+      stub_request(:get, "http://www.google.com/").to_return { rets.shift }
+
+      ret = @pool.get(urls)
+      assert ret
+      assert_equal urls.size, ret.size
+      ret.sort.each_with_index do |r, idx|
+        assert_equal idx+1+(urls.size*i), r
+      end
+
+    end
+  end
+
   def test_get_nil
     pool = Curl::ThreadPool.new
     ret = pool.get([])

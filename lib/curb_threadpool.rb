@@ -114,6 +114,7 @@ class ThreadPool
         loop do
           break if @reqs.empty?
           req = @reqs.shift
+          break if req.nil? # can sometimes reach here due to a race condition. saw it a lot on travis
           client.url = req.uri
 
           args = ["http_#{req.method}"]
