@@ -7,6 +7,7 @@ group :development do
   gem "bundler"
   gem "jeweler"
 
+  gem "micron", :github => "chetan/micron"
   gem "minitest", "<5.0"
   gem "webmock"
 

@@ -9,7 +9,8 @@ rescue Bundler::BundlerError => e
 end
 
 require 'test_guard'
-TestGuard.load_simplecov()
+require "minitest/unit" # require this first so we can stub properly
+require "micron/minitest"
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
@@ -18,5 +19,3 @@ require 'webmock/minitest'
 
 class MiniTest::Unit::TestCase
 end
-
-MiniTest::Unit.autorun
